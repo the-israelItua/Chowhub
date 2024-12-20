@@ -10,7 +10,7 @@ namespace ChowHub.Models
     public class Driver
     {
         public int Id { get; set; }
-        public string ApplicationUserId { get; set; } = string.Empty;
+        public string? ApplicationUserId { get; set; } = string.Empty;
         public ApplicationUser? ApplicationUser { get; set; }
         public string StateOfOrigin { get; set; } = string.Empty;
         public string ProfilePicture { get; set; } = string.Empty;

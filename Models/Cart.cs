@@ -10,9 +10,9 @@ namespace ChowHub.Models
     public class Cart
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public Customer? User { get; set; }
-        public int RestaurantId { get; set; }
+        public int? RestaurantId { get; set; }
         public Restaurant? Restaurant { get; set; }
         public ICollection<CartItem>? CartItems { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;

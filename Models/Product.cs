@@ -14,7 +14,7 @@ namespace ChowHub.Models
         public string ImageUrl { get; set; } = string.Empty;
         [Precision(18, 2)]
         public decimal Price { get; set; }
-        public int RestaurantId { get; set; }
+        public int? RestaurantId { get; set; }
         public Restaurant? Restaurant { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

@@ -29,84 +29,89 @@ namespace ChowHub.Data
                     .HasOne(r => r.ApplicationUser) 
                     .WithOne()
                     .HasForeignKey<Customer>(r => r.ApplicationUserId) 
-                    .OnDelete(DeleteBehavior.Cascade); 
+                    .OnDelete(DeleteBehavior.SetNull); 
 
                 modelBuilder.Entity<Restaurant>()
                     .HasOne(r => r.ApplicationUser) 
                     .WithOne()
                     .HasForeignKey<Restaurant>(r => r.ApplicationUserId) 
-                    .OnDelete(DeleteBehavior.Cascade); 
+                    .OnDelete(DeleteBehavior.SetNull); 
 
                 modelBuilder.Entity<Driver>()
                     .HasOne(d => d.ApplicationUser) 
                     .WithOne() 
                     .HasForeignKey<Driver>(d => d.ApplicationUserId) 
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
 
           
                    modelBuilder.Entity<Cart>()
                     .HasOne(c => c.User)
                     .WithMany(u => u.Carts)
                     .HasForeignKey(c => c.UserId)
-                    .OnDelete(DeleteBehavior.Restrict); 
+                    .OnDelete(DeleteBehavior.SetNull); 
 
                 // Restaurant-Cart Relationship
                 modelBuilder.Entity<Cart>()
                     .HasOne(c => c.Restaurant)
                     .WithMany(r => r.Carts)
                     .HasForeignKey(c => c.RestaurantId)
-                    .OnDelete(DeleteBehavior.Restrict);
+              .OnDelete(DeleteBehavior.SetNull); 
 
                 // Cart-CartItem Relationship
                 modelBuilder.Entity<CartItem>()
                     .HasOne(ci => ci.Cart)
                     .WithMany(c => c.CartItems)
                     .HasForeignKey(ci => ci.CartId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull); 
 
                 // CartItem-Product Relationship
                 modelBuilder.Entity<CartItem>()
                     .HasOne(ci => ci.Product)
                     .WithMany()
                     .HasForeignKey(ci => ci.ProductId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                       .OnDelete(DeleteBehavior.SetNull); 
 
                 // Restaurant-Product Relationship
                 modelBuilder.Entity<Product>()
                     .HasOne(p => p.Restaurant)
                     .WithMany(r => r.Products)
                     .HasForeignKey(p => p.RestaurantId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                       .OnDelete(DeleteBehavior.SetNull); 
 
                 // User-Order Relationship
                 modelBuilder.Entity<Order>()
                     .HasOne(o => o.User)
                     .WithMany(u => u.Orders)
-                    .HasForeignKey(o => o.UserId);
+                    .HasForeignKey(o => o.UserId)
+                   .OnDelete(DeleteBehavior.SetNull); 
 
                 // Restaurant-Order Relationship
                 modelBuilder.Entity<Order>()
                     .HasOne(o => o.Restaurant)
                     .WithMany(r => r.Orders)
-                    .HasForeignKey(o => o.RestaurantId);
+                    .HasForeignKey(o => o.RestaurantId)
+                   .OnDelete(DeleteBehavior.SetNull); 
 
                 // Order-OrderItem Relationship
                 modelBuilder.Entity<OrderItem>()
                     .HasOne(oi => oi.Order)
                     .WithMany(o => o.OrderItems)
-                    .HasForeignKey(oi => oi.OrderId);
+                    .HasForeignKey(oi => oi.OrderId)
+                    .OnDelete(DeleteBehavior.SetNull); 
 
                 // OrderItem-Product Relationship
                 modelBuilder.Entity<OrderItem>()
                     .HasOne(oi => oi.Product)
                     .WithMany()
-                    .HasForeignKey(oi => oi.ProductId);
+                    .HasForeignKey(oi => oi.ProductId)
+                    .OnDelete(DeleteBehavior.SetNull); 
 
                 // Driver-Order Relationship
                 modelBuilder.Entity<Order>()
                     .HasOne(o => o.Driver)
                     .WithMany(d => d.Orders)
-                    .HasForeignKey(o => o.DriverId);
+                    .HasForeignKey(o => o.DriverId)
+                    .OnDelete(DeleteBehavior.SetNull); 
             }
 
      }

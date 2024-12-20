@@ -8,7 +8,7 @@ namespace ChowHub.Models
     public class Restaurant
     {
         public int Id { get; set; }
-        public string ApplicationUserId { get; set; } = string.Empty;
+        public string? ApplicationUserId { get; set; } = string.Empty;
         public ApplicationUser? ApplicationUser { get; set; }
         public ICollection<Product>? Products { get; set; }
         public ICollection<Order>? Orders { get; set; }
