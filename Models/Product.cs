@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChowHub.Models
 {
@@ -11,6 +12,7 @@ namespace ChowHub.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
+        [Precision(18, 2)]
         public decimal Price { get; set; }
         public int RestaurantId { get; set; }
         public Restaurant? Restaurant { get; set; }

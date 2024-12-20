@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChowHub.Data
 {
-    public class ApplicationDBContext : IdentityDbContext(User)
+    public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions){
 
         }
-        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Customer> Customers { get; set; } = null!;
         public DbSet<Restaurant> Restaurants { get; set; } = null!;
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<Cart> Carts { get; set; } = null!;
@@ -24,35 +24,59 @@ namespace ChowHub.Data
          protected override void OnModelCreating(ModelBuilder modelBuilder)
         {       
                 base.OnModelCreating(modelBuilder);
-                // User-Cart Relationship
-                modelBuilder.Entity<Cart>()
+
+                modelBuilder.Entity<Customer>()
+                    .HasOne(r => r.ApplicationUser) 
+                    .WithOne()
+                    .HasForeignKey<Customer>(r => r.ApplicationUserId) 
+                    .OnDelete(DeleteBehavior.Cascade); 
+
+                modelBuilder.Entity<Restaurant>()
+                    .HasOne(r => r.ApplicationUser) 
+                    .WithOne()
+                    .HasForeignKey<Restaurant>(r => r.ApplicationUserId) 
+                    .OnDelete(DeleteBehavior.Cascade); 
+
+                modelBuilder.Entity<Driver>()
+                    .HasOne(d => d.ApplicationUser) 
+                    .WithOne() 
+                    .HasForeignKey<Driver>(d => d.ApplicationUserId) 
+                    .OnDelete(DeleteBehavior.Cascade);
+
+          
+                   modelBuilder.Entity<Cart>()
                     .HasOne(c => c.User)
                     .WithMany(u => u.Carts)
-                    .HasForeignKey(c => c.UserId);
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.Restrict); 
 
                 // Restaurant-Cart Relationship
                 modelBuilder.Entity<Cart>()
                     .HasOne(c => c.Restaurant)
                     .WithMany(r => r.Carts)
-                    .HasForeignKey(c => c.RestaurantId);
+                    .HasForeignKey(c => c.RestaurantId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 // Cart-CartItem Relationship
                 modelBuilder.Entity<CartItem>()
                     .HasOne(ci => ci.Cart)
                     .WithMany(c => c.CartItems)
-                    .HasForeignKey(ci => ci.CartId);
+                    .HasForeignKey(ci => ci.CartId)
+                 .OnDelete(DeleteBehavior.Restrict);
 
                 // CartItem-Product Relationship
                 modelBuilder.Entity<CartItem>()
                     .HasOne(ci => ci.Product)
                     .WithMany()
-                    .HasForeignKey(ci => ci.ProductId);
+                    .HasForeignKey(ci => ci.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 // Restaurant-Product Relationship
                 modelBuilder.Entity<Product>()
                     .HasOne(p => p.Restaurant)
                     .WithMany(r => r.Products)
-                    .HasForeignKey(p => p.RestaurantId);
+                    .HasForeignKey(p => p.RestaurantId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 // User-Order Relationship
                 modelBuilder.Entity<Order>()
