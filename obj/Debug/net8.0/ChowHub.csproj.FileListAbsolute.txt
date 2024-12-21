@@ -152,3 +152,4 @@ C:\Users\Cash America\ChowHub\obj\Debug\net8.0\refint\ChowHub.dll
 C:\Users\Cash America\ChowHub\obj\Debug\net8.0\ChowHub.pdb
 C:\Users\Cash America\ChowHub\obj\Debug\net8.0\ChowHub.genruntimeconfig.cache
 C:\Users\Cash America\ChowHub\obj\Debug\net8.0\ref\ChowHub.dll
+C:\Users\Cash America\ChowHub\bin\Debug\net8.0\settings.json

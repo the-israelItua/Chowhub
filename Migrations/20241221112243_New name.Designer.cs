@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChowHub.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241220154511_Initial migration")]
-    partial class Initialmigration
+    [Migration("20241221112243_New name")]
+    partial class Newname
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,10 +72,6 @@ namespace ChowHub.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");

@@ -1,0 +1,29 @@
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+
+namespace ChowHub.Services
+{
+    public class RoleService
+    {
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public RoleService(RoleManager<IdentityRole> roleManager)
+        {
+            _roleManager = roleManager;
+        }
+
+        public async Task CreateRolesAsync()
+        {
+            var roles = new[] { "RESTAURANT", "CUSTOMER", "DRIVER" };
+
+            foreach (var role in roles)
+            {
+                var roleExist = await _roleManager.RoleExistsAsync(role);
+                if (!roleExist)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+        }
+    }
+}

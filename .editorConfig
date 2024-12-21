@@ -1,0 +1,11 @@
+[*.cs]
+# C# code style
+indent_style = space
+indent_size = 4
+tab_width = 4
+insert_spaces = true
+max_line_length = 120
+csharp_new_line_before_members = true
+csharp_new_line_between_methods = true
+csharp_indent_case_contents = true
+csharp_indent_labels = when_required
