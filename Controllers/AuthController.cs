@@ -1,4 +1,5 @@
 using ChowHub.Data;
+using ChowHub.Dtos;
 using ChowHub.Dtos.Restaurants;
 using ChowHub.Interfaces;
 using ChowHub.Models;
@@ -15,12 +16,14 @@ namespace ChowHub.Controllers.Restaurants
         private readonly UserManager<ApplicationUser> _restaurantManager;
         private readonly ITokenService _tokenService;
         private readonly ApplicationDBContext _dbContext;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AuthController(UserManager<ApplicationUser> restaurantManager, ITokenService tokenService, ApplicationDBContext dbContext)
+        public AuthController(UserManager<ApplicationUser> restaurantManager, ITokenService tokenService, ApplicationDBContext dbContext, SignInManager<ApplicationUser> signInManager)
         {
             _restaurantManager = restaurantManager;
             _tokenService = tokenService;
             _dbContext = dbContext;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -103,6 +106,45 @@ namespace ChowHub.Controllers.Restaurants
                     Data = e.Message
                 });
             }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            var foundUser = await _restaurantManager.Users.FirstOrDefaultAsync(s => s.Email == loginDto.Email);
+            if (foundUser == null)
+            {
+                return Unauthorized(new ErrorResponse<string>
+                {
+                    Status = 401,
+                    Message = "Email or password incorrect"
+                });
+            }
+
+            var passwordCheck = await _signInManager.CheckPasswordSignInAsync(foundUser, loginDto.Password, false);
+
+            if (!passwordCheck.Succeeded)
+            {
+                return Unauthorized(new ErrorResponse<string>
+                {
+                    Status = 401,
+                    Message = "Email or password incorrect"
+                });
+            }
+
+
+            var responseData = new NewRestaurantDto
+            {
+                User = foundUser,
+                Token = _tokenService.CreateToken(foundUser)
+            };
+
+            return Ok(new ApiResponse<NewRestaurantDto>
+            {
+                Status = 201,
+                Message = "Login successful.",
+                Data = responseData
+            });
         }
     }
 }

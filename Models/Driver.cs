@@ -10,6 +10,9 @@ namespace ChowHub.Models
     public class Driver
     {
         public int Id { get; set; }
+        public string LicenseNumber { get; set; } = string.Empty;
+        public string VehicleType { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
         public string? ApplicationUserId { get; set; } = string.Empty;
         public ApplicationUser? ApplicationUser { get; set; }
         public string StateOfOrigin { get; set; } = string.Empty;

@@ -8,7 +8,15 @@ namespace ChowHub.Models
     public class Restaurant
     {
         public int Id { get; set; }
+        public string? Description { get; set; }
+        public string? CuisineType { get; set; }
+        public string? LogoUrl { get; set; }
+        public decimal? Rating { get; set; }
         public string? ApplicationUserId { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsActive { get; set; } = true;
+        public string Status { get; set; } = "CLOSED";
         public ApplicationUser? ApplicationUser { get; set; }
         public ICollection<Product>? Products { get; set; }
         public ICollection<Order>? Orders { get; set; }
