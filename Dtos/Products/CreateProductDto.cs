@@ -23,8 +23,5 @@ namespace ChowHub.Dtos.Products
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 1000000, ErrorMessage = "Price must be greater than 0 and realistic.")]
         public decimal Price { get; set; }
-
-        [Required(ErrorMessage = "Restaurant ID is required.")]
-        public int? RestaurantId { get; set; }
     }
 }

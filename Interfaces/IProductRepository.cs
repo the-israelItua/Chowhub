@@ -13,5 +13,7 @@ namespace ChowHub.Interfaces
         Task<List<Product>> GetProductsAsync(ProductsQueryObject productsQuery);
         Task<Product?> GetByIdAsync(int id);
         Task<Product> CreateAsync(Product product);
+        Task<Product> UpdateAsync(Product product);
+        Task<Product?> DeleteAsync(int id);
     }
 }

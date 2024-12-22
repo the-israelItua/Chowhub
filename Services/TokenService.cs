@@ -24,12 +24,16 @@ namespace MyWebApp.Services
 
         public string CreateToken(ApplicationUser user)
         {
-            var claims = new List<Claim>{
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.GivenName, user.Name)
-            };
+            var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(JwtRegisteredClaimNames.GivenName, user.Name)
+    };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
@@ -38,10 +42,13 @@ namespace MyWebApp.Services
                 Issuer = _config["JWT:Issuer"],
                 Audience = _config["JWT:Audience"]
             };
+
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
         }
+
     }
 }

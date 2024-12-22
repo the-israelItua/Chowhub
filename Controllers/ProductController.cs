@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
 using ChowHub.Dtos.Products;
 using ChowHub.helpers;
 using ChowHub.Interfaces;
 using ChowHub.Mappers;
 using ChowHub.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChowHub.Controllers
@@ -18,10 +16,12 @@ namespace ChowHub.Controllers
     {
         private readonly IProductRepository _productRepo;
         private readonly IRestaurantRepository _restaurantRepo;
-        public ProductsController(IProductRepository productRepo, IRestaurantRepository restaurantRepo)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public ProductsController(IProductRepository productRepo, IRestaurantRepository restaurantRepo, UserManager<ApplicationUser> userManager)
         {
             _productRepo = productRepo;
             _restaurantRepo = restaurantRepo;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -39,6 +39,7 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetProductByID([FromRoute] int id)
         {
             var product = await _productRepo.GetByIdAsync(id);
@@ -61,28 +62,113 @@ namespace ChowHub.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
         {
-            var restaurantExists = await _restaurantRepo.RestaurantExists(productDto.RestaurantId);
-            if (!restaurantExists)
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var restaurant = await _restaurantRepo.GetByUserIdAsync(userId);
+            if (restaurant == null)
             {
-                return BadRequest(new ErrorResponse<string>
+                return Unauthorized(new ErrorResponse<string>
                 {
-                    Status = 403,
-                    Message = "Restaurant not found"
+                    Status = 401,
+                    Message = "You do not have permission to perform this operation.",
+                    Data = userId
+                });
+            }
+            try
+            {
+
+
+                var productModel = productDto.ToProductFromCreateDto();
+
+                productModel.RestaurantId = restaurant.Id;
+                Console.WriteLine(productModel);
+                await _productRepo.CreateAsync(productModel);
+                return CreatedAtAction(nameof(GetProductByID), new { id = productModel.Id }, productModel.ToProductDto());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse<Exception>
+                {
+                    Status = 500,
+                    Message = "An unexpected error occurred.",
+                    Data = ex
+                });
+            }
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProduct([FromRoute] int id, UpdateProductDto updateDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var restaurant = await _restaurantRepo.GetByUserIdAsync(userId);
+            if (restaurant == null)
+            {
+                return Unauthorized(new ErrorResponse<string>
+                {
+                    Status = 401,
+                    Message = "You do not have permission to perform this operation."
                 });
             }
 
-            var productModel = productDto.ToProductFromCreateDto();
-            await _productRepo.CreateAsync(productModel);
-            return CreatedAtAction(nameof(GetProductByID), new { id = productModel.Id }, productModel.ToProductDto());
+            var product = await _productRepo.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Product not found"
+                });
+            }
+            if (!string.IsNullOrWhiteSpace(updateDto.Name))
+            {
+                product.Name = updateDto.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(updateDto.Description))
+            {
+                product.Description = updateDto.Description;
+            }
+
+            if (!string.IsNullOrWhiteSpace(updateDto.ImageUrl))
+            {
+                product.ImageUrl = updateDto.ImageUrl;
+            }
+
+            if (updateDto.Price.HasValue && updateDto.Price.Value > 0)
+            {
+                product.Price = updateDto.Price.Value;
+            }
+            await _productRepo.UpdateAsync(product);
+            return Ok(new ApiResponse<ProductDto>
+            {
+                Status = 200,
+                Message = "Product updated successfully.",
+                Data = product.ToProductDto()
+            });
+
         }
 
-        // [HttpPatch]
-        // public async Task<IActionResult> UpdateProduct(UpdateProductDto updateProduct){
-        //     var userId = ApplicationUser.FindFirstValue(ClaimTypes.NameIdentifier);
+        [HttpDelete]
+        [Route("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteProduct([FromRoute] int id)
+        {
+            var product = await _productRepo.DeleteAsync(id);
 
+            if (product == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Product not found."
+                });
+            }
 
-        // }
+            return NoContent();
+        }
     }
 }

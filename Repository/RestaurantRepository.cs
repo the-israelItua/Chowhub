@@ -27,6 +27,7 @@ namespace ChowHub.Repository
                 restaurants = restaurants.Where(r => r.ApplicationUser.Name.Contains(queryObject.Name));
             };
 
+            restaurants = restaurants.OrderBy(p => p.ApplicationUser.Name);
             var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
 
             return await restaurants.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
@@ -35,6 +36,10 @@ namespace ChowHub.Repository
         public async Task<Restaurant?> GetByIdAsync(int id)
         {
             return await _applicationDBContext.Restaurants.Include(r => r.ApplicationUser).FirstOrDefaultAsync(s => s.Id == id);
+        }
+        public async Task<Restaurant?> GetByUserIdAsync(string id)
+        {
+            return await _applicationDBContext.Restaurants.Include(r => r.ApplicationUser).FirstOrDefaultAsync(s => s.ApplicationUserId == id);
         }
         public async Task<Restaurant?> GetByEmailAsync(string email)
         {
@@ -46,13 +51,19 @@ namespace ChowHub.Repository
             await _applicationDBContext.SaveChangesAsync();
             return restaurant;
         }
+        public async Task<Restaurant> UpdateAsync(Restaurant restaurant)
+        {
+            _applicationDBContext.Restaurants.Update(restaurant);
+            await _applicationDBContext.SaveChangesAsync();
+            return restaurant;
+        }
         public async Task<bool> RestaurantEmailExists(string email)
         {
             return await _applicationDBContext.Restaurants.AnyAsync(s => s.ApplicationUser.Email == email);
         }
-        public async Task<bool> RestaurantExists(int? id)
+        public async Task<bool> RestaurantExists(string id)
         {
-            return await _applicationDBContext.Restaurants.AnyAsync(s => s.Id == id);
+            return await _applicationDBContext.Restaurants.AnyAsync(s => s.ApplicationUser.Id == id);
         }
     }
 }

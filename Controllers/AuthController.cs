@@ -34,7 +34,7 @@ namespace ChowHub.Controllers.Restaurants
                 var existingRestaurant = await _restaurantRepo.RestaurantEmailExists(createRestaurantDto.Email);
                 if (existingRestaurant)
                 {
-                    return Conflict(new ErrorResponse<string>{Status=409, Message = "A restaurant with this email already exists." });
+                    return Conflict(new ErrorResponse<string> { Status = 409, Message = "A restaurant with this email already exists." });
                 }
 
                 var applicationUser = new ApplicationUser
@@ -154,33 +154,33 @@ namespace ChowHub.Controllers.Restaurants
             }
 
 
-       var responseData = new RestaurantDto
-                        {
-                            Id = restaurant.Id,
-                            UserType = restaurant.ApplicationUser.UserType,
-                            Name = restaurant.ApplicationUser.Name,
-                            Address = restaurant.ApplicationUser.Address,
-                            Lga = restaurant.ApplicationUser.Lga,
-                            State = restaurant.ApplicationUser.State,
-                            RestaurantId = restaurant.Id,
-                            Description = restaurant.Description,
-                            CuisineType = restaurant.CuisineType,
-                            LogoUrl = restaurant.LogoUrl,
-                            ImageUrl = restaurant.ImageUrl,
-                            Rating = restaurant.Rating,
-                            CreatedAt = restaurant.CreatedAt,
-                            UpdatedAt = restaurant.UpdatedAt,
-                            IsActive = restaurant.IsActive,
-                            Status = restaurant.Status,
-                        };
+            var responseData = new RestaurantDto
+            {
+                Id = restaurant.Id,
+                UserType = restaurant.ApplicationUser.UserType,
+                Name = restaurant.ApplicationUser.Name,
+                Address = restaurant.ApplicationUser.Address,
+                Lga = restaurant.ApplicationUser.Lga,
+                State = restaurant.ApplicationUser.State,
+                RestaurantId = restaurant.Id,
+                Description = restaurant.Description,
+                CuisineType = restaurant.CuisineType,
+                LogoUrl = restaurant.LogoUrl,
+                ImageUrl = restaurant.ImageUrl,
+                Rating = restaurant.Rating,
+                CreatedAt = restaurant.CreatedAt,
+                UpdatedAt = restaurant.UpdatedAt,
+                IsActive = restaurant.IsActive,
+                Status = restaurant.Status,
+            };
 
-                        return StatusCode(201, new ApiResponse<RestaurantDto>
-                        {
-                            Status = 201,
-                            Message = "Login successfully.",
-                            Data = responseData,
-                            Token = _tokenService.CreateToken(restaurant.ApplicationUser)
-                        });
+            return StatusCode(201, new ApiResponse<RestaurantDto>
+            {
+                Status = 201,
+                Message = "Login successfully.",
+                Data = responseData,
+                Token = _tokenService.CreateToken(restaurant.ApplicationUser)
+            });
         }
     }
 }

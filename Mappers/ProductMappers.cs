@@ -31,7 +31,6 @@ namespace ChowHub.Mappers
                 Description = productDto.Description,
                 ImageUrl = productDto.ImageUrl,
                 Price = productDto.Price,
-                RestaurantId = productDto.RestaurantId,
             };
         }
     }

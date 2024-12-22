@@ -25,9 +25,10 @@ namespace ChowHub.Repository.Restaurants
 
             if (!string.IsNullOrWhiteSpace(productsQuery.Name))
             {
-              products = products.Where(p => p.Name.Contains(productsQuery.Name));
+                products = products.Where(p => p.Name.Contains(productsQuery.Name));
             }
 
+            products = products.OrderBy(p => p.Name);
             var skipNumber = (productsQuery.PageNumber - 1) * productsQuery.PageSize;
 
             return await products.Skip(skipNumber).Take(productsQuery.PageSize).ToListAsync();
@@ -41,6 +42,26 @@ namespace ChowHub.Repository.Restaurants
         public async Task<Product> CreateAsync(Product product)
         {
             await _applicationDBContext.Products.AddAsync(product);
+            await _applicationDBContext.SaveChangesAsync();
+            return product;
+        }
+
+        public async Task<Product> UpdateAsync(Product product)
+        {
+            _applicationDBContext.Products.Update(product);
+            await _applicationDBContext.SaveChangesAsync();
+            return product;
+        }
+
+        public async Task<Product?> DeleteAsync(int id)
+        {
+            var product = await _applicationDBContext.Products.FirstOrDefaultAsync(s => s.Id == id);
+            if (product == null)
+            {
+                return null;
+            }
+
+            _applicationDBContext.Products.Remove(product);
             await _applicationDBContext.SaveChangesAsync();
             return product;
         }

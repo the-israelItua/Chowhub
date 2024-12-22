@@ -13,24 +13,25 @@ namespace ChowHub.Mappers
         {
             return new RestaurantDto
 
-                        {
-                            Id = restaurant.Id,
-                            UserType = restaurant.ApplicationUser.UserType,
-                            Name = restaurant.ApplicationUser.Name,
-                            Address = restaurant.ApplicationUser.Address,
-                            Lga = restaurant.ApplicationUser.Lga,
-                            State = restaurant.ApplicationUser.State,
-                            RestaurantId = restaurant.Id,
-                            Description = restaurant.Description,
-                            CuisineType = restaurant.CuisineType,
-                            LogoUrl = restaurant.LogoUrl,
-                            ImageUrl = restaurant.ImageUrl,
-                            Rating = restaurant.Rating,
-                            CreatedAt = restaurant.CreatedAt,
-                            UpdatedAt = restaurant.UpdatedAt,
-                            IsActive = restaurant.IsActive,
-                            Status = "CLOSED",
-                        };
+            {
+                Id = restaurant.Id,
+                UserType = restaurant.ApplicationUser.UserType,
+                Name = restaurant.ApplicationUser.Name,
+                Email = restaurant.ApplicationUser.Email,
+                Address = restaurant.ApplicationUser.Address,
+                Lga = restaurant.ApplicationUser.Lga,
+                State = restaurant.ApplicationUser.State,
+                RestaurantId = restaurant.Id,
+                Description = restaurant.Description,
+                CuisineType = restaurant.CuisineType,
+                LogoUrl = restaurant.LogoUrl,
+                ImageUrl = restaurant.ImageUrl,
+                Rating = restaurant.Rating,
+                CreatedAt = restaurant.CreatedAt,
+                UpdatedAt = restaurant.UpdatedAt,
+                IsActive = restaurant.IsActive,
+                Status = restaurant.Status,
+            };
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChowHub.enums;
 
 namespace ChowHub.Models
 {
@@ -17,7 +18,7 @@ namespace ChowHub.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
-        public string Status { get; set; } = "CLOSED";
+        public RestaurantStatus Status { get; set; } = RestaurantStatus.CLOSED;
         public ApplicationUser? ApplicationUser { get; set; }
         public ICollection<Product>? Products { get; set; }
         public ICollection<Order>? Orders { get; set; }
