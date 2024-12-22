@@ -19,11 +19,13 @@ namespace ChowHub.Repository.Restaurants
         {
             _applicationDBContext = applicationDBContext;
         }
-        public async Task<List<Product>> GetProductsAsync(ProductsQueryObject productsQuery){
+        public async Task<List<Product>> GetProductsAsync(ProductsQueryObject productsQuery)
+        {
             var products = _applicationDBContext.Products.AsQueryable().Where(p => p.RestaurantId == productsQuery.RestaurantId);
 
-            if(!string.IsNullOrWhiteSpace(productsQuery.Name)){
-                products.Where(p => p.Name.Contains(productsQuery.Name));
+            if (!string.IsNullOrWhiteSpace(productsQuery.Name))
+            {
+              products = products.Where(p => p.Name.Contains(productsQuery.Name));
             }
 
             var skipNumber = (productsQuery.PageNumber - 1) * productsQuery.PageSize;
@@ -31,11 +33,13 @@ namespace ChowHub.Repository.Restaurants
             return await products.Skip(skipNumber).Take(productsQuery.PageSize).ToListAsync();
         }
 
-        public async Task<Product?> GetByIdAsync(int id){
+        public async Task<Product?> GetByIdAsync(int id)
+        {
             return await _applicationDBContext.Products.Include(c => c.Restaurant).FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<Product> CreateAsync(Product product){
+        public async Task<Product> CreateAsync(Product product)
+        {
             await _applicationDBContext.Products.AddAsync(product);
             await _applicationDBContext.SaveChangesAsync();
             return product;

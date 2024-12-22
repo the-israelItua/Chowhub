@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ChowHub.Models
 {
@@ -10,5 +7,7 @@ namespace ChowHub.Models
         public int Status { get; set; }
         public string Message { get; set; } = string.Empty;
         public T? Data { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? Token { get; set; }
     }
 }

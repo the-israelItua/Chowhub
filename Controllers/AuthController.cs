@@ -13,17 +13,17 @@ namespace ChowHub.Controllers.Restaurants
     [Route("api/restaurant")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _restaurantManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
-        private readonly ApplicationDBContext _dbContext;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IRestaurantRepository _restaurantRepo;
 
-        public AuthController(UserManager<ApplicationUser> restaurantManager, ITokenService tokenService, ApplicationDBContext dbContext, SignInManager<ApplicationUser> signInManager)
+        public AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, SignInManager<ApplicationUser> signInManager, IRestaurantRepository restaurantRepository)
         {
-            _restaurantManager = restaurantManager;
+            _userManager = userManager;
             _tokenService = tokenService;
-            _dbContext = dbContext;
             _signInManager = signInManager;
+            _restaurantRepo = restaurantRepository;
         }
 
         [HttpPost("register")]
@@ -31,10 +31,10 @@ namespace ChowHub.Controllers.Restaurants
         {
             try
             {
-                var existingRestaurant = await _dbContext.Restaurants.FirstOrDefaultAsync(r => r.ApplicationUser.Email == createRestaurantDto.Email);
-                if (existingRestaurant != null)
+                var existingRestaurant = await _restaurantRepo.RestaurantEmailExists(createRestaurantDto.Email);
+                if (existingRestaurant)
                 {
-                    return Conflict(new { message = "A restaurant with this email already exists." });
+                    return Conflict(new ErrorResponse<string>{Status=409, Message = "A restaurant with this email already exists." });
                 }
 
                 var applicationUser = new ApplicationUser
@@ -48,29 +48,50 @@ namespace ChowHub.Controllers.Restaurants
                     State = createRestaurantDto.State,
                 };
 
-                var restaurant = new Restaurant
-                {
-                    ApplicationUser = applicationUser
-                };
-
-                var createdUser = await _restaurantManager.CreateAsync(applicationUser, createRestaurantDto.Password);
+                var createdUser = await _userManager.CreateAsync(applicationUser, createRestaurantDto.Password);
                 if (createdUser.Succeeded)
                 {
-                    var roleResult = await _restaurantManager.AddToRoleAsync(applicationUser, "Restaurant");
+                    var roleResult = await _userManager.AddToRoleAsync(applicationUser, "Restaurant");
                     if (roleResult.Succeeded)
                     {
-                        var responseData = new NewRestaurantDto
+                        var restaurant = new Restaurant
                         {
-                            User = applicationUser,
-                            Token = _tokenService.CreateToken(applicationUser)
+                            ApplicationUser = applicationUser,
+                            Description = createRestaurantDto.Description,
+                            CuisineType = createRestaurantDto.CuisineType,
+                            ImageUrl = createRestaurantDto.ImageUrl,
+                            LogoUrl = createRestaurantDto.LogoUrl,
                         };
 
-                        return Ok(new ApiResponse<NewRestaurantDto>
+                        await _restaurantRepo.CreateAsync(restaurant);
+                        var responseData = new RestaurantDto
+                        {
+                            Id = restaurant.Id,
+                            UserType = applicationUser.UserType,
+                            Name = applicationUser.Name,
+                            Address = applicationUser.Address,
+                            Lga = applicationUser.Lga,
+                            State = applicationUser.State,
+                            RestaurantId = restaurant.Id,
+                            Description = restaurant.Description,
+                            CuisineType = restaurant.CuisineType,
+                            LogoUrl = restaurant.LogoUrl,
+                            ImageUrl = restaurant.ImageUrl,
+                            Rating = restaurant.Rating,
+                            CreatedAt = restaurant.CreatedAt,
+                            UpdatedAt = restaurant.UpdatedAt,
+                            IsActive = restaurant.IsActive,
+                            Status = restaurant.Status,
+                        };
+
+                        return StatusCode(201, new ApiResponse<RestaurantDto>
                         {
                             Status = 201,
                             Message = "Restaurant created successfully.",
-                            Data = responseData
+                            Data = responseData,
+                            Token = _tokenService.CreateToken(applicationUser)
                         });
+
                     }
                     else
                     {
@@ -111,8 +132,8 @@ namespace ChowHub.Controllers.Restaurants
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var foundUser = await _restaurantManager.Users.FirstOrDefaultAsync(s => s.Email == loginDto.Email);
-            if (foundUser == null)
+            var restaurant = await _restaurantRepo.GetByEmailAsync(loginDto.Email);
+            if (restaurant == null)
             {
                 return Unauthorized(new ErrorResponse<string>
                 {
@@ -121,7 +142,7 @@ namespace ChowHub.Controllers.Restaurants
                 });
             }
 
-            var passwordCheck = await _signInManager.CheckPasswordSignInAsync(foundUser, loginDto.Password, false);
+            var passwordCheck = await _signInManager.CheckPasswordSignInAsync(restaurant.ApplicationUser, loginDto.Password, false);
 
             if (!passwordCheck.Succeeded)
             {
@@ -133,18 +154,33 @@ namespace ChowHub.Controllers.Restaurants
             }
 
 
-            var responseData = new NewRestaurantDto
-            {
-                User = foundUser,
-                Token = _tokenService.CreateToken(foundUser)
-            };
+       var responseData = new RestaurantDto
+                        {
+                            Id = restaurant.Id,
+                            UserType = restaurant.ApplicationUser.UserType,
+                            Name = restaurant.ApplicationUser.Name,
+                            Address = restaurant.ApplicationUser.Address,
+                            Lga = restaurant.ApplicationUser.Lga,
+                            State = restaurant.ApplicationUser.State,
+                            RestaurantId = restaurant.Id,
+                            Description = restaurant.Description,
+                            CuisineType = restaurant.CuisineType,
+                            LogoUrl = restaurant.LogoUrl,
+                            ImageUrl = restaurant.ImageUrl,
+                            Rating = restaurant.Rating,
+                            CreatedAt = restaurant.CreatedAt,
+                            UpdatedAt = restaurant.UpdatedAt,
+                            IsActive = restaurant.IsActive,
+                            Status = restaurant.Status,
+                        };
 
-            return Ok(new ApiResponse<NewRestaurantDto>
-            {
-                Status = 201,
-                Message = "Login successful.",
-                Data = responseData
-            });
+                        return StatusCode(201, new ApiResponse<RestaurantDto>
+                        {
+                            Status = 201,
+                            Message = "Login successfully.",
+                            Data = responseData,
+                            Token = _tokenService.CreateToken(restaurant.ApplicationUser)
+                        });
         }
     }
 }

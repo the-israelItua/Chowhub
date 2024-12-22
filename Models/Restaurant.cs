@@ -11,7 +11,8 @@ namespace ChowHub.Models
         public string? Description { get; set; }
         public string? CuisineType { get; set; }
         public string? LogoUrl { get; set; }
-        public decimal? Rating { get; set; }
+        public string? ImageUrl { get; set; }
+        public decimal? Rating { get; set; } = 5;
         public string? ApplicationUserId { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

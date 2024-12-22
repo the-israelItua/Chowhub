@@ -1,0 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace ChowHub.Dtos.Products
+{
+    public class UpdateProductDto
+    {
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
+        public string Name { get; set; } = string.Empty;
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
+        public string Description { get; set; } = string.Empty;
+        [Url(ErrorMessage = "Image URL must be a valid URL.")]
+        public string ImageUrl { get; set; } = string.Empty;
+        [Range(0.01, 1000000, ErrorMessage = "Price must be greater than 0 and realistic.")]
+        public decimal Price { get; set; } 
+    }
+}

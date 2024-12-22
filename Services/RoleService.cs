@@ -1,9 +1,10 @@
+using ChowHub.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 
 namespace ChowHub.Services
 {
-    public class RoleService
+    public class RoleService : IRoleService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
 

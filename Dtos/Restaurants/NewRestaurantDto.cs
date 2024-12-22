@@ -9,6 +9,7 @@ namespace ChowHub.Dtos.Restaurants
     public class NewRestaurantDto
     {
         public ApplicationUser User { get; set; }
+        public Restaurant Restaurant { get; set; }
         public string Token { get; set; } = string.Empty;
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChowHub.Controllers
-{   
+{
     [ApiController]
     [Route("api/product")]
     public class ProductsController : ControllerBase
@@ -20,16 +20,18 @@ namespace ChowHub.Controllers
         private readonly IRestaurantRepository _restaurantRepo;
         public ProductsController(IProductRepository productRepo, IRestaurantRepository restaurantRepo)
         {
-          _productRepo = productRepo; 
-          _restaurantRepo = restaurantRepo; 
+            _productRepo = productRepo;
+            _restaurantRepo = restaurantRepo;
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetProducts([FromQuery] ProductsQueryObject productsQuery) {
+        public async Task<IActionResult> GetProducts([FromQuery] ProductsQueryObject productsQuery)
+        {
             var products = await _productRepo.GetProductsAsync(productsQuery);
             var mappedProducts = products.Select(s => s.ToProductDto()).ToList();
-            return Ok(new ApiResponse<List<ProductDto>>{
+            return Ok(new ApiResponse<List<ProductDto>>
+            {
                 Status = 200,
                 Message = "Products fetched successfully",
                 Data = mappedProducts
@@ -37,17 +39,21 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetProductByID([FromRoute] int id){
+        public async Task<IActionResult> GetProductByID([FromRoute] int id)
+        {
             var product = await _productRepo.GetByIdAsync(id);
 
-            if(product == null){
-               return NotFound(new ErrorResponse<string>{
+            if (product == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
                     Status = 404,
                     Message = "Product not found"
-               }); 
+                });
             }
 
-            return Ok(new ApiResponse<ProductDto>{
+            return Ok(new ApiResponse<ProductDto>
+            {
                 Status = 200,
                 Message = "Product fetched successfully.",
                 Data = product.ToProductDto()
@@ -55,10 +61,13 @@ namespace ChowHub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto){
+        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
+        {
             var restaurantExists = await _restaurantRepo.RestaurantExists(productDto.RestaurantId);
-            if(!restaurantExists){
-                return BadRequest(new ErrorResponse<string>{
+            if (!restaurantExists)
+            {
+                return BadRequest(new ErrorResponse<string>
+                {
                     Status = 403,
                     Message = "Restaurant not found"
                 });
@@ -68,5 +77,12 @@ namespace ChowHub.Controllers
             await _productRepo.CreateAsync(productModel);
             return CreatedAtAction(nameof(GetProductByID), new { id = productModel.Id }, productModel.ToProductDto());
         }
+
+        // [HttpPatch]
+        // public async Task<IActionResult> UpdateProduct(UpdateProductDto updateProduct){
+        //     var userId = ApplicationUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+        // }
     }
 }
