@@ -59,11 +59,11 @@ namespace ChowHub.Repository
         }
         public async Task<bool> RestaurantEmailExists(string email)
         {
-            return await _applicationDBContext.Restaurants.AnyAsync(s => s.ApplicationUser.Email == email);
+            return await _applicationDBContext.Restaurants.Include(c => c.ApplicationUser).AnyAsync(s => s.ApplicationUser.Email == email);
         }
-        public async Task<bool> RestaurantExists(string id)
+        public async Task<bool> RestaurantExists(int id)
         {
-            return await _applicationDBContext.Restaurants.AnyAsync(s => s.ApplicationUser.Id == id);
+            return await _applicationDBContext.Restaurants.AnyAsync(s => s.Id == id);
         }
     }
 }

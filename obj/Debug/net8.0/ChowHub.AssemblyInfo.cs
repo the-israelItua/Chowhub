@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChowHub")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1591f71155c2aeac9f07edd0801244eb4d6b475a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e5e25dd85be4df70622e483b52ed24dfd0fc4d06")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChowHub")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChowHub")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -12,6 +12,6 @@ namespace ChowHub.Interfaces
         Task<Restaurant> CreateAsync(Restaurant restaurant);
         Task<Restaurant> UpdateAsync(Restaurant restaurant);
         Task<bool> RestaurantEmailExists(string email);
-        Task<bool> RestaurantExists(string id);
+        Task<bool> RestaurantExists(int id);
     }
 }

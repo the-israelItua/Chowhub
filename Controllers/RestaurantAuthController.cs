@@ -7,23 +7,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChowHub.Controllers.Restaurants
+namespace ChowHub.Controllers
 {
     [ApiController]
     [Route("api/restaurant")]
-    public class AuthController : ControllerBase
+    public class RestaurantAuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IRestaurantRepository _restaurantRepo;
 
-        public AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, SignInManager<ApplicationUser> signInManager, IRestaurantRepository restaurantRepository)
+        public RestaurantAuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, SignInManager<ApplicationUser> signInManager, IRestaurantRepository restaurantRepo)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
-            _restaurantRepo = restaurantRepository;
+            _restaurantRepo = restaurantRepo;
         }
 
         [HttpPost("register")]

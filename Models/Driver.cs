@@ -18,6 +18,7 @@ namespace ChowHub.Models
         public string StateOfOrigin { get; set; } = string.Empty;
         public string ProfilePicture { get; set; } = string.Empty;
         public string Status { get; set; } = "AVAILABLE";
+        public decimal? Rating { get; set; } = 5;
         public ICollection<Order>? Orders { get; set; }
     }
 }
