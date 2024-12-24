@@ -1,4 +1,5 @@
 using ChowHub.Data;
+using ChowHub.helpers;
 using ChowHub.Interfaces;
 using ChowHub.Models;
 using ChowHub.Repository;
@@ -86,6 +87,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<RoleService>();

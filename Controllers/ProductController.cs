@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ChowHub.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/product")]
     public class ProductsController : ControllerBase
@@ -25,7 +26,6 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetProducts([FromQuery] ProductsQueryObject productsQuery)
         {
             var products = await _productRepo.GetProductsAsync(productsQuery);
@@ -39,7 +39,6 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize]
         public async Task<IActionResult> GetProductByID([FromRoute] int id)
         {
             var product = await _productRepo.GetByIdAsync(id);
@@ -62,7 +61,6 @@ namespace ChowHub.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -100,7 +98,6 @@ namespace ChowHub.Controllers
 
         [HttpPatch]
         [Route("{id}")]
-        [Authorize]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, UpdateProductDto updateDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -154,7 +151,6 @@ namespace ChowHub.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id)
         {
             var product = await _productRepo.DeleteAsync(id);

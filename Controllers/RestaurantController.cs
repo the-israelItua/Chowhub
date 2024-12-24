@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ChowHub.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/restaurant")]
     public class RestaurantController : ControllerBase
@@ -20,7 +21,6 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetRestaurants([FromQuery] RestaurantQueryObject queryObject)
         {
             var restaurants = await _restaurantRepo.GetAsync(queryObject);
@@ -34,7 +34,6 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize]
         public async Task<IActionResult> GetRestaurantByID([FromRoute] int id)
         {
             var restaurant = await _restaurantRepo.GetByIdAsync(id);
@@ -57,7 +56,6 @@ namespace ChowHub.Controllers
         }
 
         [HttpPatch]
-        [Authorize]
         public async Task<IActionResult> UpdateRestaurant([FromRoute] int id, UpdateRestaurantDto updateDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
