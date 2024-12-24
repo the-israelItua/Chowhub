@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChowHub.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class UpdateCartModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -193,7 +193,8 @@ namespace ChowHub.Migrations
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StateOfOrigin = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfilePicture = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Rating = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -221,7 +222,7 @@ namespace ChowHub.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -240,7 +241,7 @@ namespace ChowHub.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    CustomerId = table.Column<int>(type: "int", nullable: true),
                     RestaurantId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -248,8 +249,8 @@ namespace ChowHub.Migrations
                 {
                     table.PrimaryKey("PK_Carts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Carts_Customers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Carts_Customers_CustomerId",
+                        column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
@@ -267,7 +268,7 @@ namespace ChowHub.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    CustomerId = table.Column<int>(type: "int", nullable: true),
                     RestaurantId = table.Column<int>(type: "int", nullable: true),
                     DriverId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -277,8 +278,8 @@ namespace ChowHub.Migrations
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orders_Customers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Orders_Customers_CustomerId",
+                        column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
@@ -425,14 +426,14 @@ namespace ChowHub.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Carts_CustomerId",
+                table: "Carts",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Carts_RestaurantId",
                 table: "Carts",
                 column: "RestaurantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Carts_UserId",
-                table: "Carts",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_ApplicationUserId",
@@ -459,6 +460,11 @@ namespace ChowHub.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_DriverId",
                 table: "Orders",
                 column: "DriverId");
@@ -467,11 +473,6 @@ namespace ChowHub.Migrations
                 name: "IX_Orders_RestaurantId",
                 table: "Orders",
                 column: "RestaurantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_UserId",
-                table: "Orders",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_RestaurantId",

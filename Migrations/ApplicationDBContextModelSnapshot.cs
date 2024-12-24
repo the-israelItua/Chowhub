@@ -121,17 +121,17 @@ namespace ChowHub.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("RestaurantId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("RestaurantId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RestaurantId");
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("RestaurantId");
 
                     b.ToTable("Carts");
                 });
@@ -201,6 +201,9 @@ namespace ChowHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("Rating")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("StateOfOrigin")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -237,6 +240,9 @@ namespace ChowHub.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DriverId")
                         .HasColumnType("int");
 
@@ -247,16 +253,13 @@ namespace ChowHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("DriverId");
 
                     b.HasIndex("RestaurantId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -360,9 +363,8 @@ namespace ChowHub.Migrations
                     b.Property<decimal?>("Rating")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -511,19 +513,19 @@ namespace ChowHub.Migrations
 
             modelBuilder.Entity("ChowHub.Models.Cart", b =>
                 {
+                    b.HasOne("ChowHub.Models.Customer", "Customer")
+                        .WithMany("Carts")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("ChowHub.Models.Restaurant", "Restaurant")
                         .WithMany("Carts")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("ChowHub.Models.Customer", "User")
-                        .WithMany("Carts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.Navigation("Customer");
 
                     b.Navigation("Restaurant");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChowHub.Models.CartItem", b =>
@@ -565,6 +567,11 @@ namespace ChowHub.Migrations
 
             modelBuilder.Entity("ChowHub.Models.Order", b =>
                 {
+                    b.HasOne("ChowHub.Models.Customer", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("ChowHub.Models.Driver", "Driver")
                         .WithMany("Orders")
                         .HasForeignKey("DriverId")
@@ -575,16 +582,11 @@ namespace ChowHub.Migrations
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("ChowHub.Models.Customer", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.Navigation("Customer");
 
                     b.Navigation("Driver");
 
                     b.Navigation("Restaurant");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChowHub.Models.OrderItem", b =>

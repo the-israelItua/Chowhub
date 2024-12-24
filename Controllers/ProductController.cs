@@ -81,7 +81,7 @@ namespace ChowHub.Controllers
                 var productModel = productDto.ToProductFromCreateDto();
 
                 productModel.RestaurantId = restaurant.Id;
-                Console.WriteLine(productModel);
+
                 await _productRepo.CreateAsync(productModel);
                 return CreatedAtAction(nameof(GetProductByID), new { id = productModel.Id }, productModel.ToProductDto());
             }

@@ -10,8 +10,8 @@ namespace ChowHub.Models
     public class Cart
     {
         public int Id { get; set; }
-        public string? UserId { get; set; }
-        public Customer? User { get; set; }
+        public int? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
         public int? RestaurantId { get; set; }
         public Restaurant? Restaurant { get; set; }
         public ICollection<CartItem>? CartItems { get; set; }

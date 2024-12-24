@@ -19,7 +19,7 @@ namespace ChowHub.Repository
 
         public async Task<List<Cart>> GetAsync(string userId)
         {
-            return await _applicationDBContext.Carts.Where(s => s.UserId == userId).Include(c => c.Restaurant).ToListAsync();
+            return await _applicationDBContext.Carts.Include(c => c.Customer).Where(s => s.Customer.ApplicationUserId == userId).Include(c => c.Restaurant).ToListAsync();
         }
 
         public async Task<Cart?> GetByIdAsync(int id, string userId)
@@ -27,7 +27,8 @@ namespace ChowHub.Repository
             return await _applicationDBContext.Carts
                         .Include(c => c.Restaurant)
                         .Include(c => c.CartItems)
-                        .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+                        .Include(c => c.Customer)
+                        .FirstOrDefaultAsync(s => s.Id == id && s.Customer.ApplicationUserId == userId);
         }
         public async Task<Cart> CreateAsync(Cart cart)
         {
@@ -38,7 +39,7 @@ namespace ChowHub.Repository
 
          public async Task<Cart?> DeleteAsync(int id, string userId)
         {
-            var cart = await _applicationDBContext.Carts.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+            var cart = await _applicationDBContext.Carts.Include(c => c.Customer).FirstOrDefaultAsync(s => s.Id == id && s.Customer.ApplicationUserId == userId);
             if (cart == null)
             {
                 return null;

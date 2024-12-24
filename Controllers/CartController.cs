@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace ChowHub.Controllers
 {
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "CUSTOMER")]
     [ApiController]
     [Route("/cart")]
     public class CartController : ControllerBase
@@ -20,10 +20,12 @@ namespace ChowHub.Controllers
 
         private readonly ICartRepository _cartRepo;
         private readonly IRestaurantRepository _restaurantRepo;
-        public CartController(ICartRepository cartRepo, IRestaurantRepository restaurantRepo)
+        private readonly ICustomerRepository _customerRepo;
+        public CartController(ICartRepository cartRepo, IRestaurantRepository restaurantRepo, ICustomerRepository customerRepo)
         {
             _cartRepo = cartRepo;
             _restaurantRepo = restaurantRepo;
+            _customerRepo = customerRepo;
         }
 
         [HttpGet]
@@ -42,6 +44,7 @@ namespace ChowHub.Controllers
         public async Task<IActionResult> GetCartById([FromRoute] int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var cart = await _cartRepo.GetByIdAsync(id, userId);
             if (cart == null)
             {
@@ -63,6 +66,7 @@ namespace ChowHub.Controllers
         public async Task<IActionResult> CreateCart([FromBody] int restaurantId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
 
             var restaurant = await _restaurantRepo.GetByIdAsync(restaurantId);
 
@@ -75,9 +79,20 @@ namespace ChowHub.Controllers
                 });
             }
 
+            var customer = await _customerRepo.GetByEmailAsync(userEmail);
+
+            if (customer == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Customer not found"
+                });
+            }
+
             var cartModel = new Cart
             {
-                UserId = userId,
+                CustomerId = customer.Id,
                 RestaurantId = restaurantId,
             };
 

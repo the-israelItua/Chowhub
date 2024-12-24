@@ -8,8 +8,8 @@ namespace ChowHub.Models
     public class Order
     {
         public int Id { get; set; }
-        public int? UserId { get; set; }
-        public Customer? User { get; set; }
+        public int? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
         public int? RestaurantId { get; set; }
         public Restaurant? Restaurant { get; set; }
         public int? DriverId { get; set; }

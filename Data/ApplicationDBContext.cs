@@ -47,9 +47,9 @@ namespace ChowHub.Data
 
 
             modelBuilder.Entity<Cart>()
-             .HasOne(c => c.User)
+             .HasOne(c => c.Customer)
              .WithMany(u => u.Carts)
-             .HasForeignKey(c => c.UserId)
+             .HasForeignKey(c => c.CustomerId)
              .OnDelete(DeleteBehavior.SetNull);
 
             // Restaurant-Cart Relationship
@@ -82,9 +82,9 @@ namespace ChowHub.Data
 
             // User-Order Relationship
             modelBuilder.Entity<Order>()
-                .HasOne(o => o.User)
+                .HasOne(o => o.Customer)
                 .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserId)
+                .HasForeignKey(o => o.CustomerId)
                .OnDelete(DeleteBehavior.SetNull);
 
             // Restaurant-Order Relationship
