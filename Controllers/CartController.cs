@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ChowHub.Dtos.Carts;
 using ChowHub.helpers;
 using ChowHub.Interfaces;
 using ChowHub.Models;
@@ -12,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace ChowHub.Controllers
 {
-    [Authorize(Roles = "CUSTOMER")]
+    [Authorize]
     [ApiController]
     [Route("/cart")]
     public class CartController : ControllerBase
@@ -21,11 +22,13 @@ namespace ChowHub.Controllers
         private readonly ICartRepository _cartRepo;
         private readonly IRestaurantRepository _restaurantRepo;
         private readonly ICustomerRepository _customerRepo;
-        public CartController(ICartRepository cartRepo, IRestaurantRepository restaurantRepo, ICustomerRepository customerRepo)
+        private readonly IProductRepository _productRepo;
+        public CartController(ICartRepository cartRepo, IRestaurantRepository restaurantRepo, ICustomerRepository customerRepo, IProductRepository productRepo)
         {
             _cartRepo = cartRepo;
             _restaurantRepo = restaurantRepo;
             _customerRepo = customerRepo;
+            _productRepo = productRepo;
         }
 
         [HttpGet]
@@ -63,12 +66,12 @@ namespace ChowHub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCart([FromBody] int restaurantId)
+        public async Task<IActionResult> CreateCart([FromBody] CreateCartDto createDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
 
-            var restaurant = await _restaurantRepo.GetByIdAsync(restaurantId);
+            var restaurant = await _restaurantRepo.GetByIdAsync(createDto.RestaurantId);
 
             if (restaurant == null)
             {
@@ -93,7 +96,7 @@ namespace ChowHub.Controllers
             var cartModel = new Cart
             {
                 CustomerId = customer.Id,
-                RestaurantId = restaurantId,
+                RestaurantId = createDto.RestaurantId,
             };
 
             await _cartRepo.CreateAsync(cartModel);
@@ -101,7 +104,7 @@ namespace ChowHub.Controllers
             var response = new ApiResponse<Cart>
             {
                 Status = 201,
-                Message = "Product created successfully",
+                Message = "Cart created successfully",
                 Data = cartModel,
             };
             return CreatedAtAction(
@@ -129,5 +132,54 @@ namespace ChowHub.Controllers
 
             return NoContent();
         }
-    }
+    
+
+    [HttpPost]
+    [Route("add")]
+    public async Task<IActionResult> AddItem([FromBody] AddCartItemDto addCartItemDto) {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var cart = await _cartRepo.GetByIdAsync(addCartItemDto.CartId, userId);
+
+            if (cart == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Cart not found."
+                });
+            }
+
+            var product = await _productRepo.GetByIdAsync(addCartItemDto.ProductId);
+
+             if (product == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Product not found."
+                });
+            }
+
+            var cartItemModel = new CartItem
+            {
+                CartId = addCartItemDto.CartId,
+                ProductId = addCartItemDto.ProductId,
+                Quantity = addCartItemDto.Quantity,
+            };
+
+            await _cartRepo.AddItemAsync(cartItemModel);
+
+            var response = new ApiResponse<CartItem>
+            {
+                Status = 201,
+                Message = "Product added to cart",
+                Data = cartItemModel,
+            };
+            return CreatedAtAction(
+                        nameof(GetCartById),
+                        new { id = cartItemModel.Id },
+                        response
+                    );
+
+    }}
 }

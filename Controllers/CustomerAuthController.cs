@@ -51,7 +51,7 @@ namespace ChowHub.Controllers
                 var createdUser = await _userManager.CreateAsync(applicationUser, createCustomerDto.Password);
                 if (createdUser.Succeeded)
                 {
-                    var roleResult = await _userManager.AddToRoleAsync(applicationUser, "customer");
+                    var roleResult = await _userManager.AddToRoleAsync(applicationUser, "CUSTOMER");
                     if (roleResult.Succeeded)
                     {
                         var customer = new Customer

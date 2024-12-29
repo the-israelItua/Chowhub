@@ -12,5 +12,7 @@ namespace ChowHub.helpers
         public Task<Cart> CreateAsync(Cart cart);
         public Task<Cart?> GetByIdAsync(int id, string userId);
         public Task<Cart?> DeleteAsync(int id, string userId);
+        public Task<CartItem> AddItemAsync(CartItem cartItem);
+
     }
 }
