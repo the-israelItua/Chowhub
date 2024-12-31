@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ChowHub.Dtos.Restaurants;
+using ChowHub.Enums;
 using ChowHub.helpers;
 using ChowHub.Interfaces;
 using ChowHub.Mappers;
@@ -87,7 +88,7 @@ namespace ChowHub.Controllers
             {
                 restaurant.ImageUrl = updateDto.ImageUrl;
             }
-            if (updateDto.Status == enums.RestaurantStatus.OPEN || updateDto.Status == enums.RestaurantStatus.CLOSED)
+            if (updateDto.Status == RestaurantStatus.OPEN || updateDto.Status == RestaurantStatus.CLOSED)
             {
                 restaurant.Status = updateDto.Status;
             }

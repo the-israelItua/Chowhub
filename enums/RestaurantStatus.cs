@@ -1,8 +1,8 @@
-namespace ChowHub.enums
+namespace ChowHub.Enums
 {
-    public enum RestaurantStatus
+    public static class RestaurantStatus
     {
-        OPEN,
-        CLOSED
+        public const string OPEN = "OPEN";
+        public const string CLOSED = "CLOSED";
     }
 }

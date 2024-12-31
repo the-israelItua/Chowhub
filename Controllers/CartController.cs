@@ -181,5 +181,77 @@ namespace ChowHub.Controllers
                         response
                     );
 
-    }}
+    }
+    
+    [HttpDelete("{cartId:int}/{cartItemId:int}")]
+    public async Task<IActionResult> RemoveItem([FromRoute] int cartId, int cartItemId) {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var cart = await _cartRepo.GetByIdAsync(cartId, userId);
+
+            if (cart == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Cart not found."
+                });
+            }
+
+            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
+
+            if (cartItem == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Item not in cart."
+                });
+            }
+
+            await _cartRepo.RemoveItemAsync(cartItem);     
+
+            return Ok(new ApiResponse<string>
+            {
+                Status = 201,
+                Message = "Item removed from cart"
+            });
+    }
+
+     [HttpDelete("{cartId:int}/{cartItemId:int}")]
+    public async Task<IActionResult> UpdateQuantity([FromRoute] int cartId, int cartItemId, [FromBody] UpdateCartItemQuantityDto quantityDto) {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var cart = await _cartRepo.GetByIdAsync(cartId, userId);
+
+         if (cart == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Cart not found."
+                });
+            }
+
+            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
+
+            if (cartItem == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Item not in cart."
+                });
+            }
+
+        cartItem.Quantity = quantityDto.Quantity;
+
+        await _cartRepo.UpdateItemAsync(cartItem);     
+
+        return Ok(new ApiResponse<CartItem>
+            {
+                Status = 201,
+                Message = "Quantity updated",
+                Data = cartItem
+            });
+    }
+    }
 }

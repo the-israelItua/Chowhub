@@ -56,5 +56,17 @@ namespace ChowHub.Repository
             await _applicationDBContext.SaveChangesAsync();
             return cartItem;
         }
+
+        public async Task<CartItem> RemoveItemAsync(CartItem cartItem){
+            _applicationDBContext.CartItems.Remove(cartItem);
+            await _applicationDBContext.SaveChangesAsync();
+            return cartItem;
+        }
+
+        public async Task<CartItem> UpdateItemAsync(CartItem cartItem){
+            _applicationDBContext.CartItems.Update(cartItem);
+            await _applicationDBContext.SaveChangesAsync();
+            return cartItem;
+        }
     }
 }
