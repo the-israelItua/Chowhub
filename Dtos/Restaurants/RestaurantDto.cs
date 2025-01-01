@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ChowHub.enums;
+using ChowHub.Enums;
 
 namespace ChowHub.Dtos.Restaurants
 {
@@ -24,6 +24,6 @@ namespace ChowHub.Dtos.Restaurants
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
-        public RestaurantStatus Status { get; set; }
+        public string Status { get; set; } = RestaurantStatus.CLOSED;
     }
 }

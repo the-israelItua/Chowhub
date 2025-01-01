@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace ChowHub.Dtos.Carts
 {
-    public class AddCartItemDto
+    public class CheckoutDto
     {
         [Required]
-        public int ProductId { get; set; }
-        [Required]
-        public int Quantity { get; set; }
+        public int CartId { get; set; }
     }
 }

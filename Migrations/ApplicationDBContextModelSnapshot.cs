@@ -237,11 +237,17 @@ namespace ChowHub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("DeliveryFee")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("DriverId")
                         .HasColumnType("int");
@@ -249,9 +255,15 @@ namespace ChowHub.Migrations
                     b.Property<int?>("RestaurantId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("ServiceCharge")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -274,10 +286,6 @@ namespace ChowHub.Migrations
 
                     b.Property<int?>("OrderId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -363,8 +371,9 @@ namespace ChowHub.Migrations
                     b.Property<decimal?>("Rating")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -591,17 +600,14 @@ namespace ChowHub.Migrations
 
             modelBuilder.Entity("ChowHub.Models.OrderItem", b =>
                 {
-                    b.HasOne("ChowHub.Models.Order", "Order")
+                    b.HasOne("ChowHub.Models.Order", null)
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("ChowHub.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });

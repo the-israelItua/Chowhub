@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ChowHub.Dtos.Carts;
 using ChowHub.helpers;
 using ChowHub.Interfaces;
+using ChowHub.Mappers;
 using ChowHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,13 +33,16 @@ namespace ChowHub.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCarts(){
+        public async Task<IActionResult> GetCarts()
+        {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var carts = await _cartRepo.GetAsync(userId);
-            return Ok(new ApiResponse<List<Cart>>{
+            var mappedCarts = carts.Select(r => r.ToCartDto()).ToList();
+            return Ok(new ApiResponse<List<CartDto>>
+            {
                 Status = 200,
                 Message = "Carts fetched successfully",
-                Data = carts
+                Data = mappedCarts
             });
         }
 
@@ -57,68 +61,19 @@ namespace ChowHub.Controllers
                     Message = "cart not found"
                 });
             }
-            return Ok(new ApiResponse<Cart>
+            return Ok(new ApiResponse<CartDto>
             {
                 Status = 200,
                 Message = "Cart fetched successfully.",
-                Data = cart
+                Data = cart.ToCartDto()
             });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateCart([FromBody] CreateCartDto createDto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-
-            var restaurant = await _restaurantRepo.GetByIdAsync(createDto.RestaurantId);
-
-            if (restaurant == null)
-            {
-                return NotFound(new ErrorResponse<string>
-                {
-                    Status = 404,
-                    Message = "Restaurant not found"
-                });
-            }
-
-            var customer = await _customerRepo.GetByEmailAsync(userEmail);
-
-            if (customer == null)
-            {
-                return NotFound(new ErrorResponse<string>
-                {
-                    Status = 404,
-                    Message = "Customer not found"
-                });
-            }
-
-            var cartModel = new Cart
-            {
-                CustomerId = customer.Id,
-                RestaurantId = createDto.RestaurantId,
-            };
-
-            await _cartRepo.CreateAsync(cartModel);
-
-            var response = new ApiResponse<Cart>
-            {
-                Status = 201,
-                Message = "Cart created successfully",
-                Data = cartModel,
-            };
-            return CreatedAtAction(
-                        nameof(GetCartById),
-                        new { id = cartModel.Id },
-                        response
-                    );
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteCart([FromRoute] int id)
         {
-           var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var cart = await _cartRepo.DeleteAsync(id, userId);
 
             if (cart == null)
@@ -132,26 +87,17 @@ namespace ChowHub.Controllers
 
             return NoContent();
         }
-    
 
-    [HttpPost]
-    [Route("add")]
-    public async Task<IActionResult> AddItem([FromBody] AddCartItemDto addCartItemDto) {
+
+        [HttpPost]
+        [Route("add")]
+        public async Task<IActionResult> AddItem([FromBody] AddCartItemDto addCartItemDto)
+        {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var cart = await _cartRepo.GetByIdAsync(addCartItemDto.CartId, userId);
-
-            if (cart == null)
-            {
-                return NotFound(new ErrorResponse<string>
-                {
-                    Status = 404,
-                    Message = "Cart not found."
-                });
-            }
-
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             var product = await _productRepo.GetByIdAsync(addCartItemDto.ProductId);
 
-             if (product == null)
+            if (product == null)
             {
                 return NotFound(new ErrorResponse<string>
                 {
@@ -160,20 +106,44 @@ namespace ChowHub.Controllers
                 });
             }
 
+            var cart = await _cartRepo.GetByRestaurantIdAsync(product.RestaurantId, userId);
+
+            if (cart == null)
+            {
+                var customer = await _customerRepo.GetByEmailAsync(userEmail);
+
+                if (customer == null)
+                {
+                    return NotFound(new ErrorResponse<string>
+                    {
+                        Status = 404,
+                        Message = "Customer not found"
+                    });
+                }
+
+                var cartModel = new Cart
+                {
+                    CustomerId = customer.Id,
+                    RestaurantId = product.RestaurantId,
+                };
+
+                cart = await _cartRepo.CreateAsync(cartModel);
+            }
+
             var cartItemModel = new CartItem
             {
-                CartId = addCartItemDto.CartId,
+                CartId = cart.Id,
                 ProductId = addCartItemDto.ProductId,
                 Quantity = addCartItemDto.Quantity,
             };
 
             await _cartRepo.AddItemAsync(cartItemModel);
 
-            var response = new ApiResponse<CartItem>
+            var response = new ApiResponse<CartDto>
             {
                 Status = 201,
                 Message = "Product added to cart",
-                Data = cartItemModel,
+                Data = cart.ToCartDto(),
             };
             return CreatedAtAction(
                         nameof(GetCartById),
@@ -181,10 +151,11 @@ namespace ChowHub.Controllers
                         response
                     );
 
-    }
-    
-    [HttpDelete("{cartId:int}/{cartItemId:int}")]
-    public async Task<IActionResult> RemoveItem([FromRoute] int cartId, int cartItemId) {
+        }
+
+        [HttpDelete("{cartId:int}/{cartItemId:int}")]
+        public async Task<IActionResult> RemoveItem([FromRoute] int cartId, int cartItemId)
+        {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var cart = await _cartRepo.GetByIdAsync(cartId, userId);
 
@@ -208,21 +179,22 @@ namespace ChowHub.Controllers
                 });
             }
 
-            await _cartRepo.RemoveItemAsync(cartItem);     
+            await _cartRepo.RemoveItemAsync(cartItem);
 
             return Ok(new ApiResponse<string>
             {
                 Status = 201,
                 Message = "Item removed from cart"
             });
-    }
+        }
 
-     [HttpDelete("{cartId:int}/{cartItemId:int}")]
-    public async Task<IActionResult> UpdateQuantity([FromRoute] int cartId, int cartItemId, [FromBody] UpdateCartItemQuantityDto quantityDto) {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var cart = await _cartRepo.GetByIdAsync(cartId, userId);
+        [HttpPut("{cartId:int}/{cartItemId:int}")]
+        public async Task<IActionResult> UpdateQuantity([FromRoute] int cartId, int cartItemId, [FromBody] UpdateCartItemQuantityDto quantityDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var cart = await _cartRepo.GetByIdAsync(cartId, userId);
 
-         if (cart == null)
+            if (cart == null)
             {
                 return NotFound(new ErrorResponse<string>
                 {
@@ -242,16 +214,41 @@ namespace ChowHub.Controllers
                 });
             }
 
-        cartItem.Quantity = quantityDto.Quantity;
+            cartItem.Quantity = quantityDto.Quantity;
 
-        await _cartRepo.UpdateItemAsync(cartItem);     
+            await _cartRepo.UpdateItemAsync(cartItem);
 
-        return Ok(new ApiResponse<CartItem>
+            return Ok(new ApiResponse<CartDto>
             {
                 Status = 201,
                 Message = "Quantity updated",
-                Data = cartItem
+                Data = cart.ToCartDto()
             });
-    }
+        }
+
+        [HttpPost("checkout")]
+        public async Task<IActionResult> Checkout([FromBody] CheckoutDto checkoutDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var cart = await _cartRepo.GetByIdAsync(checkoutDto.CartId, userId);
+
+            if (cart == null || !cart.CartItems.Any())
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Cart is empty or does not exist."
+                });
+            }
+
+            var order = await _cartRepo.CheckoutAsync(cart);
+
+            return Ok(new ApiResponse<Order>
+            {
+                Status = 201,
+                Message = "Order created successfully",
+                Data = order
+            });
+        }
     }
 }

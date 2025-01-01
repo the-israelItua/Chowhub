@@ -94,13 +94,6 @@ namespace ChowHub.Data
                 .HasForeignKey(o => o.RestaurantId)
                .OnDelete(DeleteBehavior.SetNull);
 
-            // Order-OrderItem Relationship
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(oi => oi.Order)
-                .WithMany(o => o.OrderItems)
-                .HasForeignKey(oi => oi.OrderId)
-                .OnDelete(DeleteBehavior.SetNull);
-
             // OrderItem-Product Relationship
             modelBuilder.Entity<OrderItem>()
                 .HasOne(oi => oi.Product)
