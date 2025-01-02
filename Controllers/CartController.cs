@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ChowHub.Dtos.Carts;
+using ChowHub.Dtos.Orders;
 using ChowHub.helpers;
 using ChowHub.Interfaces;
 using ChowHub.Mappers;
@@ -243,11 +244,11 @@ namespace ChowHub.Controllers
 
             var order = await _cartRepo.CheckoutAsync(cart);
 
-            return Ok(new ApiResponse<Order>
+            return Ok(new ApiResponse<OrderDto>
             {
                 Status = 201,
                 Message = "Order created successfully",
-                Data = order
+                Data = order.ToOrderDto()
             });
         }
     }

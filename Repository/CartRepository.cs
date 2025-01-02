@@ -27,6 +27,7 @@ namespace ChowHub.Repository
             return await _applicationDBContext.Carts
                         .Include(c => c.Restaurant)
                         .Include(c => c.CartItems)
+                            .ThenInclude(ci => ci.Product)
                         .Include(c => c.Customer)
                         .FirstOrDefaultAsync(s => s.Id == id && s.Customer.ApplicationUserId == userId);
         }
@@ -102,6 +103,7 @@ namespace ChowHub.Repository
             };
 
             await _applicationDBContext.Orders.AddAsync(order);
+             _applicationDBContext.Carts.Remove(cart);
             await _applicationDBContext.SaveChangesAsync();
             return order;
         }
