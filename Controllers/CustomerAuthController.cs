@@ -2,6 +2,7 @@ using ChowHub.Data;
 using ChowHub.Dtos;
 using ChowHub.Dtos.Customers;
 using ChowHub.Interfaces;
+using ChowHub.Mappers;
 using ChowHub.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -60,22 +61,12 @@ namespace ChowHub.Controllers
                         };
 
                         await _customerRepo.CreateAsync(customer);
-                        var responseData = new CustomerDto
-                        {
-                            Id = customer.Id,
-                            UserType = applicationUser.UserType,
-                            Name = applicationUser.Name,
-                            Address = applicationUser.Address,
-                            Lga = applicationUser.Lga,
-                            State = applicationUser.State,
-                            CreatedAt = customer.ApplicationUser.CreatedAt,
-                        };
 
                         return StatusCode(201, new ApiResponse<CustomerDto>
                         {
                             Status = 201,
                             Message = "customer created successfully.",
-                            Data = responseData,
+                            Data = customer.ToCustomerDto(),
                             Token = _tokenService.CreateToken(applicationUser)
                         });
 
@@ -140,23 +131,11 @@ namespace ChowHub.Controllers
                 });
             }
 
-
-            var responseData = new CustomerDto
-            {
-                Id = customer.Id,
-                UserType = customer.ApplicationUser.UserType,
-                Name = customer.ApplicationUser.Name,
-                Address = customer.ApplicationUser.Address,
-                Lga = customer.ApplicationUser.Lga,
-                State = customer.ApplicationUser.State,
-                CreatedAt = customer.ApplicationUser.CreatedAt,
-            };
-
             return StatusCode(201, new ApiResponse<CustomerDto>
             {
                 Status = 201,
                 Message = "Login successfully.",
-                Data = responseData,
+                Data = customer.ToCustomerDto(),
                 Token = _tokenService.CreateToken(customer.ApplicationUser)
             });
         }

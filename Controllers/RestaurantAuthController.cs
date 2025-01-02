@@ -2,6 +2,7 @@ using ChowHub.Data;
 using ChowHub.Dtos;
 using ChowHub.Dtos.Restaurants;
 using ChowHub.Interfaces;
+using ChowHub.Mappers;
 using ChowHub.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -64,32 +65,12 @@ namespace ChowHub.Controllers
                         };
 
                         await _restaurantRepo.CreateAsync(restaurant);
-                        var responseData = new RestaurantDto
-                        {
-                            Id = restaurant.Id,
-                            UserType = applicationUser.UserType,
-                            Name = applicationUser.Name,
-                            Address = applicationUser.Address,
-                            Email = restaurant.ApplicationUser.Email,
-                            Lga = applicationUser.Lga,
-                            State = applicationUser.State,
-                            RestaurantId = restaurant.Id,
-                            Description = restaurant.Description,
-                            CuisineType = restaurant.CuisineType,
-                            LogoUrl = restaurant.LogoUrl,
-                            ImageUrl = restaurant.ImageUrl,
-                            Rating = restaurant.Rating,
-                            CreatedAt = restaurant.CreatedAt,
-                            UpdatedAt = restaurant.UpdatedAt,
-                            IsActive = restaurant.IsActive,
-                            Status = restaurant.Status,
-                        };
-
+                       
                         return StatusCode(201, new ApiResponse<RestaurantDto>
                         {
                             Status = 201,
                             Message = "Restaurant created successfully.",
-                            Data = responseData,
+                            Data = restaurant.ToRestaurantDto(),
                             Token = _tokenService.CreateToken(applicationUser)
                         });
 
@@ -154,33 +135,11 @@ namespace ChowHub.Controllers
                 });
             }
 
-
-            var responseData = new RestaurantDto
-            {
-                Id = restaurant.Id,
-                UserType = restaurant.ApplicationUser.UserType,
-                Name = restaurant.ApplicationUser.Name,
-                Address = restaurant.ApplicationUser.Address,
-                Email = restaurant.ApplicationUser.Email,
-                Lga = restaurant.ApplicationUser.Lga,
-                State = restaurant.ApplicationUser.State,
-                RestaurantId = restaurant.Id,
-                Description = restaurant.Description,
-                CuisineType = restaurant.CuisineType,
-                LogoUrl = restaurant.LogoUrl,
-                ImageUrl = restaurant.ImageUrl,
-                Rating = restaurant.Rating,
-                CreatedAt = restaurant.CreatedAt,
-                UpdatedAt = restaurant.UpdatedAt,
-                IsActive = restaurant.IsActive,
-                Status = restaurant.Status,
-            };
-
             return StatusCode(201, new ApiResponse<RestaurantDto>
             {
                 Status = 201,
                 Message = "Login successfully.",
-                Data = responseData,
+                Data = restaurant.ToRestaurantDto(),
                 Token = _tokenService.CreateToken(restaurant.ApplicationUser)
             });
         }

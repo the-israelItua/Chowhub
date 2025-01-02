@@ -26,9 +26,11 @@ namespace ChowHub.Repository
         {
             return await _applicationDBContext.Carts
                         .Include(c => c.Restaurant)
+                            .ThenInclude(ci => ci.ApplicationUser)
                         .Include(c => c.CartItems)
                             .ThenInclude(ci => ci.Product)
                         .Include(c => c.Customer)
+                            .ThenInclude(ci => ci.ApplicationUser)
                         .FirstOrDefaultAsync(s => s.Id == id && s.Customer.ApplicationUserId == userId);
         }
         public async Task<Cart?> GetByRestaurantIdAsync(int? restaurantId, string? userId)
