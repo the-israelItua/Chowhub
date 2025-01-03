@@ -65,5 +65,25 @@ namespace ChowHub.Repository
         {
             return await _applicationDBContext.Restaurants.AnyAsync(s => s.Id == id);
         }
+
+        public async Task<List<Order>> GetOrdersAsync(string userId, PaginationQueryObject queryObject)
+        {
+            var orders = _applicationDBContext.Orders.Include(c => c.OrderItems).ThenInclude(c => c.Product).Include(c => c.Customer).Include(c => c.Restaurant).ThenInclude(c => c.ApplicationUser).Where(o => o.Restaurant.ApplicationUserId == userId).AsQueryable();
+            var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+
+            return await orders.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
+        }
+
+        public async Task<Order?> GetOrderByIdAsync(int id, string userId)
+        {
+            return await _applicationDBContext.Orders.Include(c => c.OrderItems).ThenInclude(c => c.Product).Include(c => c.Customer).Include(c => c.Restaurant).ThenInclude(c => c.ApplicationUser).Where(o => o.Restaurant.ApplicationUserId == userId).FirstOrDefaultAsync(s => s.Id == id && s.Restaurant.ApplicationUserId == userId);
+        }
+
+        public async Task<Order> UpdateOrderStatusAsync(Order order)
+        {
+            _applicationDBContext.Orders.Update(order);
+            await _applicationDBContext.SaveChangesAsync();
+            return order;
+        }
     }
 }

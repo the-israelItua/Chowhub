@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChowHub.Enums;
 
 namespace ChowHub.Models
 {
@@ -18,7 +19,7 @@ namespace ChowHub.Models
         public Restaurant? Restaurant { get; set; }
         public int? DriverId { get; set; }
         public Driver? Driver { get; set; }
-        public string Status { get; set; } = "PENDING_PAYMENT";
+        public string Status { get; set; } = OrderStatus.PendingPayment.ToString();
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public ICollection<OrderItem>? OrderItems { get; set; }
     }

@@ -65,7 +65,7 @@ namespace ChowHub.Controllers
                         };
 
                         await _restaurantRepo.CreateAsync(restaurant);
-                       
+
                         return StatusCode(201, new ApiResponse<RestaurantDto>
                         {
                             Status = 201,

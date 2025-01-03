@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using ChowHub.Dtos.Orders;
 using ChowHub.Dtos.Restaurants;
 using ChowHub.Enums;
 using ChowHub.helpers;
@@ -103,5 +104,73 @@ namespace ChowHub.Controllers
             });
 
         }
+
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetRestaurantOrders(PaginationQueryObject queryObject)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var orders = await _restaurantRepo.GetOrdersAsync(userId, queryObject);
+            var mappedOrders = orders.Select(r => r.ToOrderDto()).ToList();
+            return Ok(new ApiResponse<List<OrderDto>>
+            {
+                Status = 200,
+                Message = "Orders fetched successfully",
+                Data = mappedOrders
+            });
+        }
+
+        [HttpGet("orders/{id:int}")]
+        public async Task<IActionResult> GetRestaurantOrderById([FromRoute] int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var order = await _restaurantRepo.GetOrderByIdAsync(id, userId);
+
+            if (order == null)
+            {
+                return NotFound(new ErrorResponse<string>
+                {
+                    Status = 404,
+                    Message = "Order not found"
+                });
+            }
+
+            return Ok(new ApiResponse<OrderDto>
+            {
+                Status = 200,
+                Message = "Order fetched successfully",
+                Data = order.ToOrderDto()
+            });
+        }
+
+        [HttpPatch("orders/{id:int}")]
+        public async Task<IActionResult> UpdateOrderStatus([FromRoute] int id, UpdateRestaurantOrderDto updateDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var order = await _restaurantRepo.GetOrderByIdAsync(id, userId);
+            if (order == null)
+            {
+                return Unauthorized(new ErrorResponse<string>
+                {
+                    Status = 401,
+                    Message = "Order not found"
+                });
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(updateDto.Status))
+            {
+                order.Status = updateDto.Status;
+            }
+
+            await _restaurantRepo.UpdateOrderStatusAsync(order);
+            return Ok(new ApiResponse<OrderDto>
+            {
+                Status = 200,
+                Message = "Order status updated successfully.",
+                Data = order.ToOrderDto()
+            });
+
+        }
+
     }
 }

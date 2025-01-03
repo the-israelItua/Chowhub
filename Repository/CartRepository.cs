@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChowHub.Data;
+using ChowHub.Enums;
 using ChowHub.helpers;
 using ChowHub.Models;
 using Microsoft.EntityFrameworkCore;
@@ -101,11 +102,11 @@ namespace ChowHub.Repository
                     ProductId = i.ProductId,
                     Quantity = i.Quantity,
                 }).ToList(),
-                Status = "PENDING_PAYMENT"
+                Status = OrderStatus.PendingPayment.ToString()
             };
 
             await _applicationDBContext.Orders.AddAsync(order);
-             _applicationDBContext.Carts.Remove(cart);
+            _applicationDBContext.Carts.Remove(cart);
             await _applicationDBContext.SaveChangesAsync();
             return order;
         }

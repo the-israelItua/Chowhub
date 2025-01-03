@@ -13,5 +13,8 @@ namespace ChowHub.Interfaces
         Task<Restaurant> UpdateAsync(Restaurant restaurant);
         Task<bool> RestaurantEmailExists(string email);
         Task<bool> RestaurantExists(int id);
+        Task<List<Order>> GetOrdersAsync(string userId, PaginationQueryObject queryObject);
+        Task<Order?> GetOrderByIdAsync(int id, string userid);
+        Task<Order> UpdateOrderStatusAsync(Order order);
     }
 }

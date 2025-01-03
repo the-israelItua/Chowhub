@@ -9,17 +9,18 @@ namespace ChowHub.Mappers
 {
     public static class CustomerMapper
     {
-       public static CustomerDto ToCustomerDto(this Customer customer){
-        return new CustomerDto
+        public static CustomerDto ToCustomerDto(this Customer customer)
         {
-                 Id = customer.Id,
-             UserType = customer.ApplicationUser.UserType,
+            return new CustomerDto
+            {
+                Id = customer.Id,
+                UserType = customer.ApplicationUser.UserType,
                 Name = customer.ApplicationUser.Name,
                 Address = customer.ApplicationUser.Address,
                 Lga = customer.ApplicationUser.Lga,
                 State = customer.ApplicationUser.State,
                 CreatedAt = customer.ApplicationUser.CreatedAt,
-        };
-       } 
+            };
+        }
     }
 }
